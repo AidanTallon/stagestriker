@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="style.css">
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+</head>
+<body>
+<div id="login-screen-container" class="openScreen">
+	<div class="row">
+		<div class="col-md-3">
+			<span class="label_">Username:</span>
+		</div>
+		<div class="col-md-5">
+			<input id="login-input" type="text" />
+		</div>
+		<div class="col-md-4">
+			<button onclick="clickLogin()" class="btn btn-primary btn-block">START</button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-offset-4 col-md-4">
+			<span id="login-error-message" class="error-message"></span>
+		</div>
+	</div>
+</div>
+<div id="start-screen-container" class="hiddenScreen">
+	<div class="row">
+		<div class="col-md-offset-1 col-md-3">
+			<span id="start-screen-username" class="label_"></span>
+		</div>
+		<div class="col-md-offset-3 col-md-5">
+			<span id="start-screen-id" class="label_"></span>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-offset-2 col-md-4">
+			<button id="start-screen-host-button" onclick="openHostMenu()" class="btn btn-primary btn-block">HOST</button>
+		</div>
+		<div class="col-md-4">
+			<button id="start-screen-join-button" onclick="openJoinMenu()" class="btn btn-primary btn-block">JOIN</button>
+		</div>
+	</div>
+	<div id="start-screen-host-overlay" class="hiddenOverlay">
+		<form id="game-select" action=""> <!-- TODO: PRETTIFY radio buttons -->
+			<input type="radio" name="game" value="Wii U">Wii U
+			<input type="radio" name="game" value="3DS">3DS
+			<input type="radio" name="game" value="Brawl">Brawl
+			<input type="radio" name="game" value="Melee">Melee
+			<input type="radio" name="game" value="64">64
+			<input type="radio" name="game" value="Project M">Project M
+		</form>
+		<h1 id="game-selected-title"></h1>
+		<div id="start-screen-host-instructions" style="display: none">
+			<div class="row">
+				<div class="col-md-6">
+					<span>Give this code to other user.</span>
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-md-offset-2 col-md-6">
+					<span id="start-screen-host-code"></span>
+				</div>
+				<div class="col-md-2">
+					<button onclick="copyToClipboard()" class="btn btn-info btn-block">Copy</button>
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-offset-2 col-md-8">
+				<span id="host-overlay-error-message" class="error-message"></span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<button id="host-overlay-host-button" onclick="clickHost()" class="btn btn-primary btn-block">HOST</button> <!-- TODO: NEXT step shows room Id and waiting... -->
+			</div>
+			<div class="col-md-6">
+				<button onclick="clickCancelHost()" class="btn btn-danger btn-block">Cancel</button>
+			</div>
+		</div>
+	</div>
+	<div id="start-screen-join-overlay" class="hiddenOverlay">
+		<div class="row">
+			<div class="col-md-offset-1 col-md-10">
+				<span>Paste hosts room ID here.</span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-offset-2 col-md-8">
+				<form id="join-room" action="">
+					<input type="text" name="code"> <!-- TODO: PRETTIFY input and show instructions -->
+				</form>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-offset-2 col-md-8">
+				<span id="join-overlay-error-message"></span>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-md-6">
+				<button onclick="clickJoin()" class="btn btn-primary btn-block">JOIN</button>
+			</div>
+			<div class="col-md-6">
+				<button onclick="clickCancelJoin()" class="btn btn-danger btn-block">Cancel</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="room-screen-container" class="hiddenScreen">
+	<h1 id="room-screen-game-title"></h1>
+	<div id="room-screen-info-container">
+	</div>
+	<div id="starter-stage-container">
+		<div class="row">
+			<div class="col-md-offset-4 col-md-4">
+				<h3>Starters</h3>
+			</div>
+		</div>
+		<div id="start-stage-button-row" class="row">
+		</div>
+	</div>
+	<div id="counterpick-stage-container">
+		<div class="row">
+			<div class="col-md-offset-4 col-md-4">
+				<h3>Counterpicks</h3>
+			</div>
+		</div>
+		<div id="counterpick-stage-button-row" class="row">
+		</div>
+	</div>
+	<div id="room-screen-chat-container">
+		<ul id="chat-log">
+		</ul>
+		<form id="chat-form">
+			<div class="row">
+				<div class="col-md-8">
+					<input id="chat-input" type="text" />
+				</div>
+				<div class="col-md-4">
+					<input type="submit" value="Send" onclick="clickSendChat(); return false;" />
+				</div>
+			</div>
+		</form>
+	</div>
+	<button onclick="leaveRoom()" class="btn btn-danger">Leave Room</button>
+</div>
+
+
+<!-- Socket.IO -->
+<script src="/socket.io/socket.io.js"></script>
+<!-- jQuery -->
+<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<!-- Bootstrap -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
+<script src="script.js">
+</script>
+</body>
+</html>

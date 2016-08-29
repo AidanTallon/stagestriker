@@ -1,0 +1,8 @@
+{
+  "name": "hypest-team-stagestriker",
+  "version": "0.0.1",
+  "description": "online stagestriking app for super smash bros games",
+  "dependencies": {
+    "express": "^4.10.2"
+  }
+}
